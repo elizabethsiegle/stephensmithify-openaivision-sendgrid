@@ -1,0 +1,3 @@
+[console_scripts]
+base256 = base256.__main__:main
+
