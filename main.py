@@ -1,20 +1,18 @@
-from IPython.display import display, Image, Audio
-import cv2 #opencv-python-headless
-import base64 
-import time
-import requests
-import tempfile
-import numpy as np
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import (
-    Mail, Attachment, FileContent, FileName, FileType, Disposition)
-from moviepy.editor import VideoFileClip, AudioFileClip
-from moviepy.audio.io.AudioFileClip import AudioFileClip
-import openai
-import os
+# Standard library imports
+import base64
 import io
+import os
+import tempfile
+
+# Related third-party imports
+import cv2  # opencv-python-headless
+import requests
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+from moviepy.editor import VideoFileClip
+import openai
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import (Attachment, Disposition, FileContent, FileName, FileType, Mail)
 import streamlit as st
-from dotenv import dotenv_values
 
 st.image("stephensmith.jpeg")
 prompt = """
@@ -125,16 +123,16 @@ def merge_audio_video(video_filename, audio_filename, output_filename):
     return output_filename
 
 st.header("Stephen Smith-ify a video :basketball:")
-st.write("This Replit app uses Streamlit, OpenAI's new Vision API, Twilio SendGrid, and OpenCV (among other libraries) to generate Stephen Smith-esque commentary for an input basketball video file.")
+st.write("This [Replit](https://replit.com/) app uses [Streamlit](https://streamlit.io/), [OpenAI's new Vision API](https://platform.openai.com/docs/guides/vision), [Twilio SendGrid](https://sendgrid.com/), and [OpenCV](https://opencv.org/) (among other libraries) to generate [Stephen Smith](https://en.wikipedia.org/wiki/Stephen_A._Smith)-esque commentary for an input basketball video file.")
 uploaded_file = st.file_uploader("Upload a video file", type=["mp4"])
 email = st.text_input("Email to send new video with Stephen Smith commentary to")
 if st.button('Stephen Smith-ify!', type="primary") and uploaded_file is not None:
     st.video(uploaded_file)
-    with st.spinner('Processing...'):
+    with st.spinner('Processing📈...'):
         base64Frames, video_filename, video_length = video_to_frames(uploaded_file)
-        rough_num_words = video_length*2
+        rough_num_words = video_length*2 + 7
         prompt += f"(This video clip is {video_length} seconds long. Make sure the output text includes no more than {rough_num_words} words)"
-        st.text_area(prompt)
+        st.markdown(f"*prompt:  {prompt}*")
         text = frames_to_story(base64Frames, prompt)
         st.write(text)
 
@@ -151,8 +149,8 @@ if st.button('Stephen Smith-ify!', type="primary") and uploaded_file is not None
         message = Mail(
             from_email='stephen_smithified@replit-sendgrid-openaivision.com',
             to_emails=email,
-            subject='New Video',
-            html_content='It is attached'
+            subject='Stephen Smith-ified Video',
+            html_content='Enjoy! <3 '
         )
         with open(final_video_filename, 'rb') as f:
             data = f.read()
@@ -179,6 +177,6 @@ if st.button('Stephen Smith-ify!', type="primary") and uploaded_file is not None
         os.unlink(video_filename)
         os.unlink(audio_filename)
         os.unlink(final_video_filename)
-
+st.markdown("*Sometimes the OpenAI Vision request cannot be made (likely due to too many frames in a long video, try again or try a shorter video.)*")
 st.write("Made w/ ❤️ in SF 🌁 [@TwilioDevs](https://instagram.com/twiliodevs)")
-st.write("✅ out the [code on GitHub](https://github.com/elizabethsiegle/stephensmithify-sendgrid-streamlit-openaivision)")
+st.write("✅ out the [code on GitHub](https://github.com/elizabethsiegle/stephensmithify-openaivision-sendgrid)")
